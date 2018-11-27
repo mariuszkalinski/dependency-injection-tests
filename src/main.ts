@@ -1,3 +1,6 @@
+import { Container } from 'inversify';
+import 'reflect-metadata';
+
 import { Bass, Drumms, Guitar, Vocal } from './entities/instruments';
 
 import {
@@ -9,23 +12,63 @@ import {
   SteveHarris,
 } from './entities/musicians';
 
+import { SERVICE_IDENTIFIER } from './constants/identifiers';
+import { TAG } from './constants/tags';
 import { Band } from './entities/band/band';
+import { IBand, IInstrument, IMusician } from './interfaces';
 
-const vocalist = new BruceDickinson(new Vocal());
-const bassist = new SteveHarris(new Bass());
-const drummer = new NickoMcBrain(new Drumms());
-const firstGuitar = new AdrianSmith(new Guitar());
-const secondGuitar = new DaveMurray(new Guitar());
-const thirdGuitar = new JanickGers(new Guitar());
+const container = new Container();
 
-const ironMaiden = new Band(
-  'Iron Maiden',
-  vocalist,
-  bassist,
-  drummer,
-  firstGuitar,
-  secondGuitar,
-  thirdGuitar
-);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(AdrianSmith)
+  .whenTargetNamed(TAG.GUITAR1);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(BruceDickinson)
+  .whenTargetNamed(TAG.VOCAL);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(DaveMurray)
+  .whenTargetNamed(TAG.GUITAR2);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(JanickGers)
+  .whenTargetNamed(TAG.GUITAR3);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(NickoMcBrain)
+  .whenTargetNamed(TAG.DRUMMS);
+container
+  .bind<IMusician>(SERVICE_IDENTIFIER.MUSICIAN)
+  .to(SteveHarris)
+  .whenTargetNamed(TAG.BASS);
 
-console.log(ironMaiden.play()); //tslint:disable-line
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Bass)
+  .whenParentNamed(TAG.BASS);
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Drumms)
+  .whenParentNamed(TAG.DRUMMS);
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Guitar)
+  .whenParentNamed(TAG.GUITAR1);
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Guitar)
+  .whenParentNamed(TAG.GUITAR2);
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Guitar)
+  .whenParentNamed(TAG.GUITAR3);
+container
+  .bind<IInstrument>(SERVICE_IDENTIFIER.INSTRUMENT)
+  .to(Vocal)
+  .whenParentNamed(TAG.VOCAL);
+container.bind<IBand>(SERVICE_IDENTIFIER.BAND).to(Band);
+
+const response = container.get<IBand>(SERVICE_IDENTIFIER.BAND);
+console.log(response.play()); //tslint:disable-line

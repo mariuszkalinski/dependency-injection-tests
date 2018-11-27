@@ -1,0 +1,8 @@
+export const TAG = {
+  BASS: 'BASS',
+  DRUMMS: 'DRUMMS',
+  GUITAR1: 'GUITAR1',
+  GUITAR2: 'GUITAR2',
+  GUITAR3: 'GUITAR3',
+  VOCAL: 'VOCAL',
+};
